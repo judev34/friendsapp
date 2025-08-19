@@ -1,0 +1,1025 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "EventApp API",
+        "description": "API REST pour la gestion d'événements collaboratifs - Plateforme de création, gestion et inscription à des événements",
+        "version": "1.0.0",
+        "contact": {
+            "name": "EventApp Support",
+            "email": "support@eventapp.com"
+        }
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8000",
+            "description": "Serveur de développement"
+        }
+    ],
+    "paths": {
+        "/api/register": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Inscription d'un nouvel utilisateur",
+                "operationId": "post_api_register",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password",
+                                    "firstName",
+                                    "lastName"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "user@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "minLength": 8,
+                                        "example": "motdepasse123"
+                                    },
+                                    "firstName": {
+                                        "type": "string",
+                                        "example": "Jean"
+                                    },
+                                    "lastName": {
+                                        "type": "string",
+                                        "example": "Dupont"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Utilisateur cr\u00e9\u00e9 avec succ\u00e8s",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "user": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "format": "email",
+                                                    "example": "user@example.com"
+                                                },
+                                                "firstName": {
+                                                    "type": "string",
+                                                    "example": "Jean"
+                                                },
+                                                "lastName": {
+                                                    "type": "string",
+                                                    "example": "Dupont"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Donn\u00e9es invalides"
+                    },
+                    "409": {
+                        "description": "Email d\u00e9j\u00e0 utilis\u00e9"
+                    }
+                }
+            }
+        },
+        "/api/login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Connexion utilisateur",
+                "operationId": "post_api_login",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email"
+                                    },
+                                    "password": {
+                                        "type": "string"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Connexion r\u00e9ussie",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "user": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "format": "email",
+                                                    "example": "user@example.com"
+                                                },
+                                                "firstName": {
+                                                    "type": "string",
+                                                    "example": "Jean"
+                                                },
+                                                "lastName": {
+                                                    "type": "string",
+                                                    "example": "Dupont"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Identifiants incorrects"
+                    }
+                }
+            }
+        },
+        "/api/me": {
+            "get": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "R\u00e9cup\u00e9rer le profil utilisateur",
+                "operationId": "get_api_me",
+                "responses": {
+                    "200": {
+                        "description": "Profil utilisateur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "user": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "email": {
+                                                    "type": "string",
+                                                    "format": "email",
+                                                    "example": "user@example.com"
+                                                },
+                                                "firstName": {
+                                                    "type": "string",
+                                                    "example": "Jean"
+                                                },
+                                                "lastName": {
+                                                    "type": "string",
+                                                    "example": "Dupont"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifi\u00e9"
+                    }
+                }
+            }
+        },
+        "/api/logout": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "D\u00e9connexion utilisateur",
+                "operationId": "post_api_logout",
+                "responses": {
+                    "200": {
+                        "description": "D\u00e9connexion r\u00e9ussie",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/events": {
+            "get": {
+                "tags": [
+                    "Events"
+                ],
+                "summary": "Liste des \u00e9v\u00e9nements",
+                "operationId": "get_api_events_list",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 20
+                        }
+                    },
+                    {
+                        "name": "location",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "startDate",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "endDate",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "isFree",
+                        "in": "query",
+                        "schema": {
+                            "type": "boolean"
+                        }
+                    },
+                    {
+                        "name": "tags",
+                        "in": "query",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Liste des \u00e9v\u00e9nements"
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Events"
+                ],
+                "summary": "Cr\u00e9er un \u00e9v\u00e9nement",
+                "operationId": "post_api_events_create",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "title",
+                                    "description",
+                                    "startDate",
+                                    "location",
+                                    "maxParticipants"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Conf\u00e9rence Tech 2024"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Une conf\u00e9rence sur les derni\u00e8res technologies"
+                                    },
+                                    "startDate": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2024-06-15T14:00:00Z"
+                                    },
+                                    "endDate": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2024-06-15T18:00:00Z"
+                                    },
+                                    "location": {
+                                        "type": "string",
+                                        "example": "Paris, France"
+                                    },
+                                    "maxParticipants": {
+                                        "type": "integer",
+                                        "example": 100
+                                    },
+                                    "price": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 25.99
+                                    },
+                                    "tags": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "example": [
+                                            "tech",
+                                            "conference"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "\u00c9v\u00e9nement cr\u00e9\u00e9 avec succ\u00e8s",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "event": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "title": {
+                                                    "type": "string",
+                                                    "example": "Conf\u00e9rence Tech 2024"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "Une conf\u00e9rence sur les derni\u00e8res technologies"
+                                                },
+                                                "startDate": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2024-06-15T14:00:00Z"
+                                                },
+                                                "location": {
+                                                    "type": "string",
+                                                    "example": "Paris, France"
+                                                },
+                                                "maxParticipants": {
+                                                    "type": "integer",
+                                                    "example": 100
+                                                },
+                                                "isPublished": {
+                                                    "type": "boolean",
+                                                    "example": false
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Donn\u00e9es invalides"
+                    },
+                    "401": {
+                        "description": "Non authentifi\u00e9"
+                    }
+                }
+            }
+        },
+        "/api/events/{id}": {
+            "get": {
+                "tags": [
+                    "Events"
+                ],
+                "summary": "D\u00e9tails d'un \u00e9v\u00e9nement",
+                "operationId": "get_api_events_show",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "pattern": "\\d+"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "D\u00e9tails de l'\u00e9v\u00e9nement"
+                    },
+                    "404": {
+                        "description": "\u00c9v\u00e9nement non trouv\u00e9"
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Events"
+                ],
+                "summary": "Modifier un \u00e9v\u00e9nement",
+                "operationId": "put_api_events_update",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "pattern": "\\d+"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "title",
+                                    "description",
+                                    "startDate",
+                                    "location",
+                                    "maxParticipants"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string",
+                                        "example": "Conf\u00e9rence Tech 2024"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Une conf\u00e9rence sur les derni\u00e8res technologies"
+                                    },
+                                    "startDate": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2024-06-15T14:00:00Z"
+                                    },
+                                    "endDate": {
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2024-06-15T18:00:00Z"
+                                    },
+                                    "location": {
+                                        "type": "string",
+                                        "example": "Paris, France"
+                                    },
+                                    "maxParticipants": {
+                                        "type": "integer",
+                                        "example": 100
+                                    },
+                                    "price": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 25.99
+                                    },
+                                    "tags": {
+                                        "type": "array",
+                                        "items": {
+                                            "type": "string"
+                                        },
+                                        "example": [
+                                            "tech",
+                                            "conference"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "\u00c9v\u00e9nement modifi\u00e9 avec succ\u00e8s",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "event": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "title": {
+                                                    "type": "string",
+                                                    "example": "Conf\u00e9rence Tech 2024 - Mise \u00e0 jour"
+                                                },
+                                                "description": {
+                                                    "type": "string",
+                                                    "example": "Une conf\u00e9rence sur les derni\u00e8res technologies - Version mise \u00e0 jour"
+                                                },
+                                                "startDate": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2024-06-15T14:00:00Z"
+                                                },
+                                                "location": {
+                                                    "type": "string",
+                                                    "example": "Paris, France"
+                                                },
+                                                "maxParticipants": {
+                                                    "type": "integer",
+                                                    "example": 150
+                                                },
+                                                "isPublished": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Donn\u00e9es invalides"
+                    },
+                    "403": {
+                        "description": "Acc\u00e8s refus\u00e9"
+                    },
+                    "404": {
+                        "description": "\u00c9v\u00e9nement non trouv\u00e9"
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Events"
+                ],
+                "summary": "Supprimer un \u00e9v\u00e9nement",
+                "operationId": "delete_api_events_delete",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "pattern": "\\d+"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "\u00c9v\u00e9nement supprim\u00e9"
+                    },
+                    "403": {
+                        "description": "Acc\u00e8s refus\u00e9"
+                    },
+                    "404": {
+                        "description": "\u00c9v\u00e9nement non trouv\u00e9"
+                    },
+                    "409": {
+                        "description": "Impossible de supprimer"
+                    }
+                }
+            }
+        },
+        "/api/events/{id}/publish": {
+            "patch": {
+                "tags": [
+                    "Events"
+                ],
+                "summary": "Publier un \u00e9v\u00e9nement",
+                "operationId": "patch_api_events_publish",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "pattern": "\\d+"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "\u00c9v\u00e9nement publi\u00e9"
+                    },
+                    "403": {
+                        "description": "Acc\u00e8s refus\u00e9"
+                    },
+                    "404": {
+                        "description": "\u00c9v\u00e9nement non trouv\u00e9"
+                    }
+                }
+            }
+        },
+        "/api/events/popular": {
+            "get": {
+                "tags": [
+                    "Events"
+                ],
+                "summary": "\u00c9v\u00e9nements populaires",
+                "operationId": "get_api_events_popular",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "\u00c9v\u00e9nements populaires"
+                    }
+                }
+            }
+        },
+        "/api/events/upcoming": {
+            "get": {
+                "tags": [
+                    "Events"
+                ],
+                "summary": "\u00c9v\u00e9nements \u00e0 venir",
+                "operationId": "get_api_events_upcoming",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "\u00c9v\u00e9nements \u00e0 venir"
+                    }
+                }
+            }
+        },
+        "/api/registrations": {
+            "get": {
+                "tags": [
+                    "Registrations"
+                ],
+                "summary": "Mes inscriptions",
+                "operationId": "get_api_registrations_list",
+                "responses": {
+                    "200": {
+                        "description": "Liste des inscriptions"
+                    },
+                    "401": {
+                        "description": "Non authentifi\u00e9"
+                    }
+                }
+            }
+        },
+        "/api/registrations/upcoming": {
+            "get": {
+                "tags": [
+                    "Registrations"
+                ],
+                "summary": "Mes prochaines inscriptions",
+                "operationId": "get_api_registrations_upcoming",
+                "responses": {
+                    "200": {
+                        "description": "Prochaines inscriptions"
+                    },
+                    "401": {
+                        "description": "Non authentifi\u00e9"
+                    }
+                }
+            }
+        },
+        "/api/registrations/events/{id}": {
+            "post": {
+                "tags": [
+                    "Registrations"
+                ],
+                "summary": "S'inscrire \u00e0 un \u00e9v\u00e9nement",
+                "operationId": "post_api_registrations_register",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "pattern": "\\d+"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Inscription cr\u00e9\u00e9e"
+                    },
+                    "400": {
+                        "description": "Inscription impossible"
+                    },
+                    "401": {
+                        "description": "Non authentifi\u00e9"
+                    },
+                    "404": {
+                        "description": "\u00c9v\u00e9nement non trouv\u00e9"
+                    }
+                }
+            }
+        },
+        "/api/registrations/{id}/confirm": {
+            "patch": {
+                "tags": [
+                    "Registrations"
+                ],
+                "summary": "Confirmer une inscription",
+                "operationId": "patch_api_registrations_confirm",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "pattern": "\\d+"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Inscription confirm\u00e9e"
+                    },
+                    "400": {
+                        "description": "Confirmation impossible"
+                    },
+                    "403": {
+                        "description": "Acc\u00e8s refus\u00e9"
+                    },
+                    "404": {
+                        "description": "Inscription non trouv\u00e9e"
+                    }
+                }
+            }
+        },
+        "/api/registrations/{id}/cancel": {
+            "patch": {
+                "tags": [
+                    "Registrations"
+                ],
+                "summary": "Annuler une inscription",
+                "operationId": "patch_api_registrations_cancel",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "pattern": "\\d+"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Inscription annul\u00e9e"
+                    },
+                    "400": {
+                        "description": "Annulation impossible"
+                    },
+                    "403": {
+                        "description": "Acc\u00e8s refus\u00e9"
+                    },
+                    "404": {
+                        "description": "Inscription non trouv\u00e9e"
+                    }
+                }
+            }
+        },
+        "/api/registrations/{id}": {
+            "get": {
+                "tags": [
+                    "Registrations"
+                ],
+                "summary": "D\u00e9tails d'une inscription",
+                "operationId": "get_api_registrations_show",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "pattern": "\\d+"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "D\u00e9tails de l'inscription"
+                    },
+                    "403": {
+                        "description": "Acc\u00e8s refus\u00e9"
+                    },
+                    "404": {
+                        "description": "Inscription non trouv\u00e9e"
+                    }
+                }
+            }
+        },
+        "/api/registrations/ticket/{ticketCode}": {
+            "get": {
+                "tags": [
+                    "Registrations"
+                ],
+                "summary": "Inscription par code de billet",
+                "operationId": "get_api_registrations_by_ticket",
+                "parameters": [
+                    {
+                        "name": "ticketCode",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Inscription trouv\u00e9e"
+                    },
+                    "404": {
+                        "description": "Billet non trouv\u00e9"
+                    }
+                }
+            }
+        },
+        "/api/users/me": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Mon profil",
+                "operationId": "get_api_users_profile",
+                "responses": {
+                    "200": {
+                        "description": "Profil utilisateur"
+                    },
+                    "401": {
+                        "description": "Non authentifi\u00e9"
+                    }
+                }
+            }
+        },
+        "/api/users/me/events": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Mes \u00e9v\u00e9nements organis\u00e9s",
+                "operationId": "get_api_users_my_events",
+                "responses": {
+                    "200": {
+                        "description": "\u00c9v\u00e9nements organis\u00e9s"
+                    },
+                    "401": {
+                        "description": "Non authentifi\u00e9"
+                    }
+                }
+            }
+        },
+        "/api/users/organizers": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Liste des organisateurs",
+                "operationId": "get_api_users_organizers",
+                "responses": {
+                    "200": {
+                        "description": "Liste des organisateurs"
+                    }
+                }
+            }
+        },
+        "/api/users/search": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Rechercher des utilisateurs",
+                "operationId": "get_api_users_search",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "R\u00e9sultats de recherche"
+                    },
+                    "403": {
+                        "description": "Acc\u00e8s refus\u00e9"
+                    }
+                }
+            }
+        },
+        "/api/users/stats": {
+            "get": {
+                "tags": [
+                    "Users"
+                ],
+                "summary": "Statistiques des utilisateurs",
+                "operationId": "get_api_users_stats",
+                "responses": {
+                    "200": {
+                        "description": "Statistiques"
+                    },
+                    "403": {
+                        "description": "Acc\u00e8s refus\u00e9"
+                    }
+                }
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Authentication",
+            "description": "Gestion de l'authentification des utilisateurs"
+        },
+        {
+            "name": "Events"
+        },
+        {
+            "name": "Registrations"
+        },
+        {
+            "name": "Users"
+        }
+    ]
+}

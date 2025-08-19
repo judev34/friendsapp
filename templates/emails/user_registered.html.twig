@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Inscription confirmée</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #17a2b8;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px 5px 0 0;
+        }
+        .content {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 0 0 5px 5px;
+        }
+        .event-details {
+            background-color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status-pending { background-color: #ffc107; color: #212529; }
+        .status-confirmed { background-color: #28a745; color: white; }
+        .status-waitlist { background-color: #17a2b8; color: white; }
+        .button {
+            display: inline-block;
+            background-color: #007bff;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .footer {
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📝 Inscription enregistrée</h1>
+    </div>
+    
+    <div class="content">
+        <p>Bonjour {{ user.firstName }},</p>
+        
+        <p>Votre inscription à l'événement suivant a été enregistrée :</p>
+        
+        <div class="event-details">
+            <h3>{{ event.title }}</h3>
+            <p><strong>📅 Date :</strong> {{ event.startDate|date('d/m/Y à H:i') }}</p>
+            <p><strong>📍 Lieu :</strong> {{ event.location }}</p>
+            <p><strong>👤 Organisateur :</strong> {{ event.organizer.fullName }}</p>
+            
+            <p><strong>Statut de votre inscription :</strong> 
+                <span class="status-badge status-{{ registration.status.value }}">
+                    {{ registration.status.label }}
+                </span>
+            </p>
+            
+            {% if registration.ticketCode %}
+                <p><strong>🎫 Code de billet :</strong> <code>{{ registration.ticketCode }}</code></p>
+            {% endif %}
+        </div>
+        
+        {% if registration.status.value == 'pending' %}
+            <p><strong>Prochaines étapes :</strong></p>
+            <ul>
+                <li>Votre inscription est en attente de confirmation</li>
+                <li>Vous recevrez un email dès que votre inscription sera confirmée</li>
+                <li>Votre billet sera alors disponible au téléchargement</li>
+            </ul>
+        {% elseif registration.status.value == 'waitlist' %}
+            <p><strong>Liste d'attente :</strong></p>
+            <ul>
+                <li>L'événement est complet, vous êtes sur la liste d'attente</li>
+                <li>Vous serez automatiquement inscrit si une place se libère</li>
+                <li>Nous vous tiendrons informé de l'évolution</li>
+            </ul>
+        {% endif %}
+        
+        <p>
+            <a href="#" class="button">Voir mes inscriptions</a>
+        </p>
+        
+        <p>Merci de votre confiance !</p>
+        
+        <p>L'équipe EventApp</p>
+    </div>
+    
+    <div class="footer">
+        <p>Cet email a été envoyé automatiquement, merci de ne pas y répondre.</p>
+    </div>
+</body>
+</html>

@@ -18,3 +18,17 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    # Configuration des stratégies de notification
+    App\Service\NotificationService:
+        calls:
+            - [addStrategy, ['@App\Strategy\EmailNotificationStrategy']]
+            - [addStrategy, ['@App\Strategy\SlackNotificationStrategy']]
+
+    App\Strategy\EmailNotificationStrategy:
+        arguments:
+            $fromEmail: '%env(string:MAILER_FROM_EMAIL)%'
+
+    App\Strategy\SlackNotificationStrategy:
+        arguments:
+            $webhookUrl: '%env(string:SLACK_WEBHOOK_URL)%'

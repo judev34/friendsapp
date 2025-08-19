@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Inscription confirmée</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #28a745;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px 5px 0 0;
+        }
+        .content {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 0 0 5px 5px;
+        }
+        .event-details {
+            background-color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .ticket-info {
+            background-color: #e7f3ff;
+            border: 2px solid #007bff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            text-align: center;
+        }
+        .ticket-code {
+            font-family: 'Courier New', monospace;
+            font-size: 18px;
+            font-weight: bold;
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 3px;
+            margin: 10px 0;
+        }
+        .button {
+            display: inline-block;
+            background-color: #28a745;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 10px 5px;
+        }
+        .footer {
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>✅ Inscription confirmée !</h1>
+    </div>
+    
+    <div class="content">
+        <p>Bonjour {{ user.firstName }},</p>
+        
+        <p>Excellente nouvelle ! Votre inscription à l'événement suivant est <strong>confirmée</strong> :</p>
+        
+        <div class="event-details">
+            <h3>{{ event.title }}</h3>
+            <p><strong>📅 Date :</strong> {{ event.startDate|date('d/m/Y à H:i') }}</p>
+            <p><strong>📍 Lieu :</strong> {{ event.location }}</p>
+            <p><strong>👤 Organisateur :</strong> {{ event.organizer.fullName }}</p>
+            {% if event.price and event.price != '0.00' %}
+                <p><strong>💰 Prix :</strong> {{ event.price }}€</p>
+            {% endif %}
+        </div>
+        
+        <div class="ticket-info">
+            <h4>🎫 Votre billet</h4>
+            <p>Conservez précieusement votre code de billet :</p>
+            <div class="ticket-code">{{ registration.ticketCode }}</div>
+            <p><small>Présentez ce code à l'entrée de l'événement</small></p>
+        </div>
+        
+        <p><strong>Informations importantes :</strong></p>
+        <ul>
+            <li>Arrivez 15 minutes avant le début de l'événement</li>
+            <li>Présentez votre code de billet à l'accueil</li>
+            <li>En cas d'empêchement, vous pouvez annuler votre inscription</li>
+            <li>Vous recevrez un rappel 24h avant l'événement</li>
+        </ul>
+        
+        <p>
+            <a href="#" class="button">Télécharger mon billet PDF</a>
+            <a href="#" class="button">Ajouter au calendrier</a>
+        </p>
+        
+        <p>Nous avons hâte de vous voir à l'événement !</p>
+        
+        <p>L'équipe EventApp</p>
+    </div>
+    
+    <div class="footer">
+        <p>Cet email a été envoyé automatiquement, merci de ne pas y répondre.</p>
+    </div>
+</body>
+</html>
