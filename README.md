@@ -1,10 +1,13 @@
 # EventApp - Plateforme de Gestion d'Événements Collaboratifs
 
-Une plateforme moderne de gestion d'événements développée avec Symfony 7.3, inspirée des plateformes type "meetup" mais simplifiée.
+"Le projet oublié en état avancé de décomposition dans un vieux Dropbox.. le voici remis au gout du jour, avec Symfony 7.3."
+
+Une plateforme de gestion d'événements développée avec Symfony 7.3, inspirée des plateformes type "meetup" mais simplifiée.
 
 ## 🎯 Objectifs du Projet
 
-Ce projet a été conçu pour démontrer la maîtrise de concepts avancés en développement web :
+Ce projet a été conçu pour tester des concepts avancés en dev web :
+(Tout n'est pas encore en place)
 
 - **POO & Patterns** : Repository, Strategy, Observer, Adapter, Decorator
 - **API REST** : Documentation Swagger, pagination, filtres avancés
@@ -244,23 +247,6 @@ JWT_SECRET_KEY=%kernel.project_dir%/config/jwt/private.pem
 - Performance des requêtes DB
 - Audit de sécurité
 
-## 🎓 Valeur Pédagogique
-
-Ce projet démontre :
-
-### Compétences Techniques
-- **Architecture** : Clean Architecture, SOLID, DDD
-- **Patterns** : Strategy, Observer, Repository, Factory
-- **API Design** : REST, OpenAPI, versioning
-- **Sécurité** : OWASP Top 10, authentification moderne
-- **Performance** : Cache, optimisation DB, pagination
-
-### Compétences Métier
-- **Gestion de projet** : Planification, documentation
-- **Qualité** : Tests automatisés, CI/CD
-- **Monitoring** : Logs, métriques, alertes
-- **UX** : Interface intuitive, notifications pertinentes
-
 ## 🤝 Contribution
 
 ### Standards de Code
@@ -268,14 +254,6 @@ Ce projet démontre :
 - Conventions Symfony respectées
 - Documentation complète du code
 - Tests obligatoires pour nouvelles fonctionnalités
-
-### Workflow Git
-- Branches de fonctionnalités
-- Pull requests avec review
-- Commits conventionnels
-- Changelog automatique
-
----
 
 **Développé avec ❤️ en Symfony 7.3**
 

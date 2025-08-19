@@ -8,12 +8,14 @@ use App\Event\EventUpdatedEvent;
 use App\Service\NotificationService;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Twig\Environment;
+use Psr\Log\LoggerInterface;
 
 class EventNotificationListener
 {
     public function __construct(
         private NotificationService $notificationService,
-        private Environment $twig
+        private Environment $twig,
+        private LoggerInterface $logger
     ) {}
 
     #[AsEventListener(event: EventCreatedEvent::NAME)]
@@ -58,7 +60,12 @@ class EventNotificationListener
 
         $this->notificationService->send('email', $organizer, $subject, $message);
 
-        // TODO: Notifier les utilisateurs abonnés aux notifications d'événements
+        // Notifier les utilisateurs abonnés aux notifications d'événements
+        // TODO: Implémenter système d'abonnements utilisateurs pour notifications d'événements
+        $this->logger->info('Événement publié - notifications à implémenter', [
+            'event_id' => $eventEntity->getId(),
+            'event_title' => $eventEntity->getTitle()
+        ]);
     }
 
     #[AsEventListener(event: EventUpdatedEvent::NAME)]

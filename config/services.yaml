@@ -21,14 +21,17 @@ services:
 
     # Configuration des stratégies de notification
     App\Service\NotificationService:
+        public: true
         calls:
             - [addStrategy, ['@App\Strategy\EmailNotificationStrategy']]
             - [addStrategy, ['@App\Strategy\SlackNotificationStrategy']]
 
     App\Strategy\EmailNotificationStrategy:
+        public: true
         arguments:
-            $fromEmail: '%env(string:MAILER_FROM_EMAIL)%'
+            $fromEmail: '%env(default::MAILER_FROM_EMAIL)%'
 
     App\Strategy\SlackNotificationStrategy:
+        public: true
         arguments:
-            $webhookUrl: '%env(string:SLACK_WEBHOOK_URL)%'
+            $webhookUrl: '%env(default::SLACK_WEBHOOK_URL)%'
