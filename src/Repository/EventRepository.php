@@ -93,8 +93,8 @@ class EventRepository extends ServiceEntityRepository
             ->setParameter('published', true);
 
         foreach ($tags as $index => $tag) {
-            $qb->andWhere("JSON_CONTAINS(e.tags, :tag{$index}) = 1")
-               ->setParameter("tag{$index}", json_encode($tag));
+            $qb->andWhere('e.tags LIKE :tag' . $index)
+               ->setParameter('tag' . $index, '%"' . $tag . '"%');
         }
 
         return $qb->orderBy('e.startDate', 'ASC')
@@ -216,26 +216,106 @@ class EventRepository extends ServiceEntityRepository
                ->setParameter('endDate', $filters['endDate']);
         }
 
-        if (!empty($filters['isFree'])) {
-            $qb->andWhere('e.price IS NULL OR e.price = :zero')
-               ->setParameter('zero', '0.00');
+        if (isset($filters['isFree']) && $filters['isFree'] === true) {
+            $qb->andWhere('e.price = 0 OR e.price IS NULL');
         }
 
         if (!empty($filters['tags'])) {
             foreach ($filters['tags'] as $index => $tag) {
-                $qb->andWhere("JSON_CONTAINS(e.tags, :tag{$index}) = 1")
-                   ->setParameter("tag{$index}", json_encode($tag));
+                $qb->andWhere('e.tags LIKE :tag' . $index)
+                   ->setParameter('tag' . $index, '%"' . $tag . '"%');
             }
         }
 
-        // Tri
-        $qb->orderBy('e.' . $sortBy, $sortOrder);
+        // Compter le total
+        $totalQb = clone $qb;
+        $total = $totalQb->select('COUNT(e.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
 
-        // Pagination
-        $offset = ($page - 1) * $limit;
-        $qb->setFirstResult($offset)
-           ->setMaxResults($limit);
+        // Pagination et tri
+        $events = $qb->orderBy('e.' . $sortBy, $sortOrder)
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
 
-        return $qb->getQuery()->getResult();
+        return [
+            'events' => $events,
+            'total' => (int) $total
+        ];
     }
+
+    /**
+     * Trouve les événements par tag
+     */
+    public function findByTag(string $tag, int $limit = 10): array
+    {
+        return $this->createQueryBuilder('e')
+            ->andWhere('e.isPublished = :published')
+            ->andWhere('e.tags LIKE :tag')
+            ->setParameter('published', true)
+            ->setParameter('tag', '%"' . $tag . '"%')
+            ->orderBy('e.startDate', 'ASC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Trouve les événements recommandés par tags
+     */
+    public function findRecommendedByTags(array $tags, int $limit = 5): array
+    {
+        $qb = $this->createQueryBuilder('e')
+            ->andWhere('e.isPublished = :published')
+            ->andWhere('e.startDate > :now')
+            ->setParameter('published', true)
+            ->setParameter('now', new \DateTime());
+
+        foreach ($tags as $index => $tag) {
+            $qb->orWhere('e.tags LIKE :tag' . $index)
+               ->setParameter('tag' . $index, '%"' . $tag . '"%');
+        }
+
+        return $qb->orderBy('e.startDate', 'ASC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * Compte les événements de ce mois
+     */
+    public function countEventsThisMonth(): int
+    {
+        $startOfMonth = new \DateTime('first day of this month');
+        $endOfMonth = new \DateTime('last day of this month');
+
+        return $this->createQueryBuilder('e')
+            ->select('COUNT(e.id)')
+            ->andWhere('e.startDate >= :start')
+            ->andWhere('e.startDate <= :end')
+            ->setParameter('start', $startOfMonth)
+            ->setParameter('end', $endOfMonth)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * Obtient la moyenne de participants par événement
+     */
+    public function getAverageParticipantsPerEvent(): float
+    {
+        $result = $this->createQueryBuilder('e')
+            ->select('AVG(r_count.count) as avg_participants')
+            ->leftJoin('e.registrations', 'r')
+            ->leftJoin('(SELECT COUNT(r2.id) as count, r2.event_id FROM registration r2 WHERE r2.status = :confirmed GROUP BY r2.event_id)', 'r_count', 'WITH', 'r_count.event_id = e.id')
+            ->setParameter('confirmed', 'confirmed')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return $result ? (float) $result : 0.0;
+    }
+
 }

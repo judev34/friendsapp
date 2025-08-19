@@ -308,14 +308,40 @@ class Event
         return $this->getConfirmedRegistrationsCount() >= $this->maxParticipants;
     }
 
+    /**
+     * Vérifie si l'événement est passé
+     */
     public function isPast(): bool
     {
-        return $this->endDate < new \DateTime();
+        return $this->startDate < new \DateTime();
     }
 
+    /**
+     * Vérifie si l'événement est à venir
+     */
     public function isUpcoming(): bool
     {
         return $this->startDate > new \DateTime();
+    }
+
+    /**
+     * Vérifie si l'événement est aujourd'hui
+     */
+    public function isToday(): bool
+    {
+        $today = new \DateTime('today');
+        $tomorrow = new \DateTime('tomorrow');
+        return $this->startDate >= $today && $this->startDate < $tomorrow;
+    }
+
+    /**
+     * Obtient le nombre de jours jusqu'au début de l'événement
+     */
+    public function getDaysUntilStart(): int
+    {
+        $now = new \DateTime();
+        $diff = $now->diff($this->startDate);
+        return $diff->invert ? -$diff->days : $diff->days;
     }
 
     public function isOngoing(): bool

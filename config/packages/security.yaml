@@ -46,6 +46,13 @@ security:
         - { path: ^/api/register, roles: PUBLIC_ACCESS }
         - { path: ^/api/doc, roles: PUBLIC_ACCESS }
         - { path: ^/api/docs, roles: PUBLIC_ACCESS }
+        # Routes publiques pour consultation des événements
+        - { path: ^/api/events$, roles: PUBLIC_ACCESS, methods: [GET] }
+        - { path: ^/api/events/\d+$, roles: PUBLIC_ACCESS, methods: [GET] }
+        - { path: ^/api/events/popular, roles: PUBLIC_ACCESS, methods: [GET] }
+        - { path: ^/api/events/upcoming, roles: PUBLIC_ACCESS, methods: [GET] }
+        - { path: ^/api/events/category, roles: PUBLIC_ACCESS, methods: [GET] }
+        # Toutes les autres routes API nécessitent une authentification
         - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/admin, roles: ROLE_ADMIN }
         - { path: ^/profile, roles: ROLE_USER }

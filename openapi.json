@@ -702,7 +702,7 @@
                 "tags": [
                     "Events"
                 ],
-                "summary": "\u00c9v\u00e9nements \u00e0 venir",
+                "summary": "Événements à venir",
                 "operationId": "get_api_events_upcoming",
                 "parameters": [
                     {
@@ -715,7 +715,286 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "\u00c9v\u00e9nements \u00e0 venir"
+                        "description": "Événements à venir"
+                    }
+                }
+            }
+        },
+        "/api/events/category/{category}": {
+            "get": {
+                "tags": [
+                    "Events"
+                ],
+                "summary": "Événements par catégorie",
+                "operationId": "get_api_events_by_category",
+                "parameters": [
+                    {
+                        "name": "category",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Nom de la catégorie/tag",
+                        "example": "tech"
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 20
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Liste des événements de la catégorie",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer"
+                                            },
+                                            "title": {
+                                                "type": "string"
+                                            },
+                                            "description": {
+                                                "type": "string"
+                                            },
+                                            "startDate": {
+                                                "type": "string",
+                                                "format": "date-time"
+                                            },
+                                            "location": {
+                                                "type": "string"
+                                            },
+                                            "tags": {
+                                                "type": "array",
+                                                "items": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/events/recommended": {
+            "get": {
+                "tags": [
+                    "Events"
+                ],
+                "summary": "Événements recommandés",
+                "operationId": "get_api_events_recommended",
+                "security": [
+                    {
+                        "session": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Événements recommandés pour l'utilisateur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "type": "object",
+                                        "properties": {
+                                            "id": {
+                                                "type": "integer"
+                                            },
+                                            "title": {
+                                                "type": "string"
+                                            },
+                                            "description": {
+                                                "type": "string"
+                                            },
+                                            "startDate": {
+                                                "type": "string",
+                                                "format": "date-time"
+                                            },
+                                            "location": {
+                                                "type": "string"
+                                            },
+                                            "recommendationScore": {
+                                                "type": "number",
+                                                "description": "Score de recommandation basé sur l'historique"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Authentification requise"
+                    }
+                }
+            }
+        },
+        "/api/events/statistics": {
+            "get": {
+                "tags": [
+                    "Events"
+                ],
+                "summary": "Statistiques globales des événements",
+                "operationId": "get_api_events_global_statistics",
+                "security": [
+                    {
+                        "session": []
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Statistiques globales",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "totalEvents": {
+                                            "type": "integer",
+                                            "description": "Nombre total d'événements"
+                                        },
+                                        "totalRegistrations": {
+                                            "type": "integer",
+                                            "description": "Nombre total d'inscriptions"
+                                        },
+                                        "totalRevenue": {
+                                            "type": "number",
+                                            "description": "Revenus totaux générés"
+                                        },
+                                        "eventsThisMonth": {
+                                            "type": "integer",
+                                            "description": "Événements créés ce mois"
+                                        },
+                                        "averageParticipants": {
+                                            "type": "number",
+                                            "description": "Moyenne de participants par événement"
+                                        },
+                                        "popularCategories": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "category": {
+                                                        "type": "string"
+                                                    },
+                                                    "count": {
+                                                        "type": "integer"
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Authentification requise"
+                    },
+                    "403": {
+                        "description": "Accès réservé aux administrateurs"
+                    }
+                }
+            }
+        },
+        "/api/events/{id}/duplicate": {
+            "post": {
+                "tags": [
+                    "Events"
+                ],
+                "summary": "Dupliquer un événement",
+                "operationId": "post_api_events_duplicate",
+                "security": [
+                    {
+                        "session": []
+                    }
+                ],
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "pattern": "\\d+"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Événement dupliqué avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer"
+                                        },
+                                        "title": {
+                                            "type": "string",
+                                            "description": "Titre avec préfixe 'Copie de'"
+                                        },
+                                        "description": {
+                                            "type": "string"
+                                        },
+                                        "startDate": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "description": "Date décalée d'une semaine"
+                                        },
+                                        "isPublished": {
+                                            "type": "boolean",
+                                            "example": false,
+                                            "description": "Toujours false pour les copies"
+                                        },
+                                        "organizer": {
+                                            "type": "object",
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer"
+                                                },
+                                                "email": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Authentification requise"
+                    },
+                    "403": {
+                        "description": "Seul le propriétaire peut dupliquer"
+                    },
+                    "404": {
+                        "description": "Événement non trouvé"
                     }
                 }
             }
@@ -1007,19 +1286,32 @@
             }
         }
     },
+    "components": {
+        "securitySchemes": {
+            "session": {
+                "type": "apiKey",
+                "in": "cookie",
+                "name": "PHPSESSID",
+                "description": "Authentification par session Symfony"
+            }
+        }
+    },
     "tags": [
         {
             "name": "Authentication",
             "description": "Gestion de l'authentification des utilisateurs"
         },
         {
-            "name": "Events"
+            "name": "Events",
+            "description": "Gestion des événements - CRUD complet, recherche avancée, statistiques"
         },
         {
-            "name": "Registrations"
+            "name": "Registrations",
+            "description": "Gestion des inscriptions aux événements"
         },
         {
-            "name": "Users"
+            "name": "Users",
+            "description": "Gestion des utilisateurs et profils"
         }
     ]
 }

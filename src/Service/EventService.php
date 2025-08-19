@@ -99,19 +99,25 @@ class EventService
             $registration->cancel();
         }
 
-        // Marquer l'événement comme non publié
-        $event->setIsPublished(false);
-        $event->setUpdatedAt(new \DateTime());
-
+        // Supprimer physiquement l'événement de la base de données
+        $this->entityManager->remove($event);
         $this->entityManager->flush();
     }
 
     /**
-     * Recherche d'événements avec filtres
+     * Recherche d'événements avec filtres avancés
      */
     public function searchEvents(array $filters = [], int $page = 1, int $limit = 20): array
     {
-        return $this->eventRepository->findWithFilters($filters, 'startDate', 'ASC', $page, $limit);
+        $result = $this->eventRepository->findWithFilters($filters, 'startDate', 'ASC', $page, $limit);
+        
+        return [
+            'events' => $result['events'],
+            'total' => $result['total'],
+            'page' => $page,
+            'limit' => $limit,
+            'pages' => ceil($result['total'] / $limit)
+        ];
     }
 
     /**
@@ -184,19 +190,44 @@ class EventService
     }
 
     /**
-     * Obtient les statistiques d'un événement
+     * Obtient les statistiques détaillées d'un événement
      */
     public function getEventStatistics(Event $event): array
     {
+        $confirmedCount = $this->registrationRepository->countByEventAndStatus($event, RegistrationStatus::CONFIRMED);
+        $pendingCount = $this->registrationRepository->countByEventAndStatus($event, RegistrationStatus::PENDING);
+        $cancelledCount = $this->registrationRepository->countByEventAndStatus($event, RegistrationStatus::CANCELLED);
+        $waitlistCount = $this->registrationRepository->countByEventAndStatus($event, RegistrationStatus::WAITLIST);
+        $totalRevenue = $this->registrationRepository->getRevenueByEvent($event);
+        
+        $maxParticipants = $event->getMaxParticipants();
+        $availableSpots = max(0, $maxParticipants - $confirmedCount);
+        $occupancyRate = $maxParticipants > 0 ? ($confirmedCount / $maxParticipants) * 100 : 0;
+        
         return [
-            'total_registrations' => $event->getRegistrations()->count(),
-            'confirmed_registrations' => $this->registrationRepository->countByEventAndStatus($event, RegistrationStatus::CONFIRMED),
-            'pending_registrations' => $this->registrationRepository->countByEventAndStatus($event, RegistrationStatus::PENDING),
-            'cancelled_registrations' => $this->registrationRepository->countByEventAndStatus($event, RegistrationStatus::CANCELLED),
-            'waitlist_registrations' => $this->registrationRepository->countByEventAndStatus($event, RegistrationStatus::WAITLIST),
-            'available_spots' => $event->getAvailableSpots(),
-            'is_full' => $event->isFull(),
-            'total_revenue' => $this->registrationRepository->getRevenueByEvent($event)
+            'registrations' => [
+                'total' => $event->getRegistrations()->count(),
+                'confirmed' => $confirmedCount,
+                'pending' => $pendingCount,
+                'cancelled' => $cancelledCount,
+                'waitlist' => $waitlistCount
+            ],
+            'capacity' => [
+                'max_participants' => $maxParticipants,
+                'available_spots' => $availableSpots,
+                'is_full' => $event->isFull(),
+                'occupancy_rate' => round($occupancyRate, 2)
+            ],
+            'revenue' => [
+                'total' => $totalRevenue,
+                'average_per_participant' => $confirmedCount > 0 ? round($totalRevenue / $confirmedCount, 2) : 0
+            ],
+            'timeline' => [
+                'days_until_event' => $event->getDaysUntilStart(),
+                'is_past' => $event->isPast(),
+                'is_today' => $event->isToday(),
+                'is_upcoming' => $event->isUpcoming()
+            ]
         ];
     }
 
@@ -215,13 +246,63 @@ class EventService
             ->setTags($originalEvent->getTags())
             ->setOrganizer($organizer);
 
-        // Les dates doivent être définies manuellement
-        // $newEvent->setStartDate(...)
-        // $newEvent->setEndDate(...)
+        // Copier les dates de l'événement original
+        $newEvent->setStartDate($originalEvent->getStartDate());
+        $newEvent->setEndDate($originalEvent->getEndDate());
 
         $this->entityManager->persist($newEvent);
         $this->entityManager->flush();
 
         return $newEvent;
+    }
+
+    /**
+     * Obtient les événements par catégorie/tags
+     */
+    public function getEventsByCategory(string $category, int $limit = 10): array
+    {
+        return $this->eventRepository->findByTag($category, $limit);
+    }
+
+    /**
+     * Obtient les événements recommandés pour un utilisateur
+     */
+    public function getRecommendedEvents(User $user, int $limit = 5): array
+    {
+        // Logique de recommandation basée sur l'historique de l'utilisateur
+        $userRegistrations = $this->registrationRepository->findByUser($user);
+        $userTags = [];
+        
+        foreach ($userRegistrations as $registration) {
+            $eventTags = $registration->getEvent()->getTags();
+            if ($eventTags) {
+                $userTags = array_merge($userTags, $eventTags);
+            }
+        }
+        
+        $userTags = array_unique($userTags);
+        
+        if (empty($userTags)) {
+            // Si pas d'historique, retourner les événements populaires
+            return $this->getPopularEvents($limit);
+        }
+        
+        return $this->eventRepository->findRecommendedByTags($userTags, $limit);
+    }
+
+    /**
+     * Obtient les statistiques globales des événements
+     */
+    public function getGlobalStatistics(): array
+    {
+        return [
+            'total_events' => $this->eventRepository->count([]),
+            'published_events' => $this->eventRepository->count(['isPublished' => true]),
+            'upcoming_events' => count($this->getUpcomingEvents()),
+            'events_this_month' => $this->eventRepository->countEventsThisMonth(),
+            'total_registrations' => $this->registrationRepository->count([]),
+            'confirmed_registrations' => $this->registrationRepository->count(['status' => RegistrationStatus::CONFIRMED]),
+            'average_participants_per_event' => $this->eventRepository->getAverageParticipantsPerEvent()
+        ];
     }
 }
