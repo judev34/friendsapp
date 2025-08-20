@@ -10,9 +10,11 @@ use App\Repository\EventRepository;
 use App\Repository\RegistrationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 use App\Event\EventCreatedEvent;
 use App\Event\EventUpdatedEvent;
 use App\Event\EventPublishedEvent;
+use App\Message\AsyncEventNotificationMessage;
 
 class EventService
 {
@@ -20,7 +22,8 @@ class EventService
         private EntityManagerInterface $entityManager,
         private EventRepository $eventRepository,
         private RegistrationRepository $registrationRepository,
-        private EventDispatcherInterface $eventDispatcher
+        private EventDispatcherInterface $eventDispatcher,
+        private MessageBusInterface $messageBus
     ) {}
 
     /**
@@ -34,8 +37,14 @@ class EventService
         $this->entityManager->persist($event);
         $this->entityManager->flush();
 
-        // Dispatch event pour notifications
+        // Dispatch event pour notifications SYNCHRONES (existant)
         $this->eventDispatcher->dispatch(new EventCreatedEvent($event), EventCreatedEvent::NAME);
+
+        // Dispatch message pour notifications ASYNCHRONES (nouveau)
+        $this->messageBus->dispatch(new AsyncEventNotificationMessage(
+            $event->getId(),
+            'created'
+        ));
 
         return $event;
     }

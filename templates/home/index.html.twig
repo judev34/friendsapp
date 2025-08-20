@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ app_name }} - Accueil{% endblock %}
+
+{% block body %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white text-center">
+                    <h1 class="mb-0">🎉 {{ app_name }}</h1>
+                    <p class="mb-0">API de gestion d'événements et d'inscriptions</p>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h3>📡 Endpoints API</h3>
+                            <ul class="list-group list-group-flush">
+                                {% for name, endpoint in api_endpoints %}
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <strong>{{ name }}</strong>
+                                    <code>{{ endpoint }}</code>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h3>🔧 Outils</h3>
+                            <div class="list-group">
+                                <a href="/api/doc" class="list-group-item list-group-item-action">
+                                    📖 Documentation API
+                                </a>
+                                <a href="/health" class="list-group-item list-group-item-action">
+                                    ❤️ Health Check
+                                </a>
+                                <a href="http://localhost:15672" target="_blank" class="list-group-item list-group-item-action">
+                                    🐰 RabbitMQ Management
+                                </a>
+                                <a href="http://localhost:31553" target="_blank" class="list-group-item list-group-item-action">
+                                    📧 Mailpit (Emails)
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4 text-center">
+                        <span class="badge bg-success">Version {{ version }}</span>
+                        <span class="badge bg-info">Symfony {{ constant('Symfony\\Component\\HttpKernel\\Kernel::VERSION') }}</span>
+                        <span class="badge bg-warning">PHP {{ constant('PHP_VERSION') }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
