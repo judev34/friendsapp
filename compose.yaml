@@ -74,7 +74,7 @@ services:
       - .:/var/www/html:rw
     environment:
       - APP_ENV=test
-      - DATABASE_URL=mysql://app:password@database-test:3306/friendsapp_test
+      - DATABASE_URL=mysql://app:password@database-test:3307/friendsapp_test
     depends_on:
       database-test:
         condition: service_healthy
