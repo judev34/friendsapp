@@ -11,7 +11,7 @@
 1. **Clic droit** sur la collection `EventApp API`
 2. Sélectionner **"Import"** dans le menu
 3. Choisir **"OpenAPI v3"**
-4. Naviguer vers : `c:\wamp64\www\friendsapp\openapi.json`
+4. Naviguer vers : `\\wsl$\Ubuntu\home\julien\www\friendsapp\openapi.json`
 5. Cliquer **"Import"**
 
 ✅ **Résultat** : Tous vos endpoints sont maintenant visibles dans Bruno
@@ -28,7 +28,7 @@
 
 ```json
 {
-  "base_url": "http://localhost:8000",
+  "base_url": "http://localhost:8080",
   "user_email": "test@example.com",
   "user_password": "motdepasse123"
 }
@@ -192,8 +192,9 @@ test("Get user profile", function() {
 - Vérifier les types de données (string, integer, etc.)
 
 ### **Erreur de connexion**
-- Vérifier que le serveur Symfony est démarré : `symfony serve`
-- Vérifier l'URL de base : `http://localhost:8000`
+- Vérifier que Docker est démarré : `docker compose up -d`
+- Vérifier l'URL de base : `http://localhost:8080`
+- Vérifier que les conteneurs sont actifs : `docker compose ps`
 
 ---
 

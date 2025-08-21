@@ -4,9 +4,15 @@
 
 ### **1. Fichier OpenAPI Disponible**
 Le fichier `openapi.json` est prêt à l'import dans Bruno :
-- **Emplacement** : `c:\wamp64\www\friendsapp\openapi.json`
+- **Emplacement** : `/home/julien/www/friendsapp/openapi.json` (WSL) ou `\\wsl$\Ubuntu\home\julien\www\friendsapp\openapi.json` (Windows)
 - **Format** : OpenAPI 3.0.0
 - **Contenu** : Tous les endpoints d'authentification et d'événements
+
+### **🔧 Configuration Docker**
+API fonctionne avec Docker :
+- **URL de base** : `http://localhost:8080` (nginx via Docker)
+- **Services** : PHP, MySQL, RabbitMQ, nginx dans des conteneurs
+- **Accès depuis Windows** : Fonctionne directement via `localhost:8080`
 
 ### **2. Procédure d'Import dans Bruno**
 
@@ -24,7 +30,7 @@ bruno
 #### **Étape 3 : Importer le fichier OpenAPI**
 1. Clic droit sur la collection → **"Import"**
 2. Sélectionner **"OpenAPI v3"**
-3. Choisir le fichier : `c:\wamp64\www\friendsapp\openapi.json`
+3. Choisir le fichier : `\\wsl$\Ubuntu\home\julien\www\friendsapp\openapi.json`
 4. Cliquer sur **"Import"**
 
 ## 📚 Endpoints Importés
@@ -52,7 +58,7 @@ Après l'import, configurer les variables :
 
 ```json
 {
-  "base_url": "http://localhost:8000",
+  "base_url": "http://localhost:8080",
   "auth_token": "",
   "user_email": "test@example.com",
   "user_password": "motdepasse123"
@@ -136,7 +142,7 @@ test("Create event", function() {
 ```json
 {
   "development": {
-    "base_url": "http://localhost:8000"
+    "base_url": "http://localhost:8080"
   },
   "staging": {
     "base_url": "https://staging.eventapp.com"

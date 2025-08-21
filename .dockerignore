@@ -1,0 +1,27 @@
+# Exclure vendor/ pour le développement
+vendor/
+
+# Exclure les fichiers de cache et logs
+var/cache/
+var/log/
+
+# Exclure les fichiers de configuration locaux
+.env.local
+.env.*.local
+
+# Exclure les fichiers de développement
+node_modules/
+.git/
+.gitignore
+README.md
+*.md
+
+# Exclure les fichiers de test
+tests/
+phpunit.xml.dist
+
+# Exclure les fichiers Docker
+Dockerfile*
+docker-compose*.yml
+compose*.yaml
+docker/

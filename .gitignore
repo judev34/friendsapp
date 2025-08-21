@@ -1,6 +1,9 @@
 
 ###> symfony/framework-bundle ###
 .env
+.env.dev
+.env.docker
+.env.test
 /.env.local
 /.env.local.php
 /.env.*.local
@@ -20,4 +23,12 @@
 /assets/vendor/
 ###< symfony/asset-mapper ###
 
+# Fichiers temporaires et de développement
+*.tmp
+*.bak
+*copy*
+cookies.txt
+*.bat
+
+# Documentation personnelle
 ./README_PERSO.md
