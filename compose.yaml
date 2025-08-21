@@ -19,13 +19,30 @@ services:
     command: --default-authentication-plugin=mysql_native_password
 ###< doctrine/doctrine-bundle ###
 
+  # Interface graphique pour MySQL
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8081:80"
+    environment:
+      - PMA_HOST=database
+      - PMA_PORT=3306
+      - PMA_USER=app
+      - PMA_PASSWORD=password
+      - MYSQL_ROOT_PASSWORD=root
+    depends_on:
+      database:
+        condition: service_healthy
+
 ###> symfony/application ###
   php:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
     volumes:
+      # Monter tout le projet y compris vendor/
       - .:/var/www/html:rw
+      # Volumes pour cache et logs
       - symfony_cache:/var/www/html/var/cache:rw
       - symfony_logs:/var/www/html/var/log:rw
     environment:
