@@ -215,6 +215,11 @@ php bin/phpunit tests/Api/
 - Contrôleurs API : 95%
 - Repositories : 90%
 
+### Conventions et Guide
+- Controllers minces, services riches: la logique métier et le formatage des données sont gérés côté service.
+- Exemple: `EventController::globalStatistics()` retourne directement le résultat du service `EventService::getGlobalStatistics()`.
+- L'endpoint `GET /api/events/statistics` expose des clés en snake_case et camelCase (compat interne + lisibilité externe). Détails dans `TESTING_COMPLETE_GUIDE.md` (section « Conventions de Conception » et « Format de Réponse »).
+
 ## 🚀 Déploiement
 
 ### Production Ready

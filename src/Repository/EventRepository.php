@@ -307,15 +307,25 @@ class EventRepository extends ServiceEntityRepository
      */
     public function getAverageParticipantsPerEvent(): float
     {
-        $result = $this->createQueryBuilder('e')
-            ->select('AVG(r_count.count) as avg_participants')
-            ->leftJoin('e.registrations', 'r')
-            ->leftJoin('(SELECT COUNT(r2.id) as count, r2.event_id FROM registration r2 WHERE r2.status = :confirmed GROUP BY r2.event_id)', 'r_count', 'WITH', 'r_count.event_id = e.id')
+        // Total events
+        $totalEvents = (int) $this->createQueryBuilder('e')
+            ->select('COUNT(e.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        if ($totalEvents === 0) {
+            return 0.0;
+        }
+
+        // Total confirmed registrations across all events
+        $totalConfirmed = (int) $this->createQueryBuilder('e')
+            ->leftJoin('e.registrations', 'r', 'WITH', 'r.status = :confirmed')
+            ->select('COUNT(r.id)')
             ->setParameter('confirmed', 'confirmed')
             ->getQuery()
             ->getSingleScalarResult();
 
-        return $result ? (float) $result : 0.0;
+        return $totalConfirmed / $totalEvents;
     }
 
 }

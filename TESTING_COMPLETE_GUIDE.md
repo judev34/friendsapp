@@ -1,10 +1,24 @@
-# 🧪 Guide Complet des Tests pour l'API Events
+# 🧪 Guide Complet des Tests - Friends App
+
+## 📋 Vue d'Ensemble
 
 ## 📋 Vue d'ensemble
 
 Ce guide présente la stratégie de test complète mise en place pour l'API Events, couvrant tous les aspects fonctionnels et d'intégration.
 
 ## 🏗️ Architecture des Tests
+
+### **Structure des Tests**
+```
+tests/
+├── Services/               # Tests unitaires des services
+│   └── NotificationServiceTest.php
+├── Functional/             # Tests fonctionnels (API)
+│   ├── EventApiTest.php
+│   ├── EventApiIntegrationTest.php
+│   └── EventApiAuthenticatedTest.php
+└── bootstrap.php           # Configuration des tests
+```
 
 ### 1. **Tests Fonctionnels de Base** (`EventApiTest.php`)
 - Tests des endpoints publics sans authentification
@@ -80,6 +94,25 @@ Ce guide présente la stratégie de test complète mise en place pour l'API Even
 
 ## 🚀 Exécution des Tests
 
+### **Commandes de Base**
+```bash
+# Exécuter tous les tests (PHP local)
+php bin/phpunit
+
+# Ou via Docker si nécessaire
+docker compose exec php php bin/phpunit
+
+# Tests avec couverture de code
+php bin/phpunit --coverage-html coverage/
+
+# Tests spécifiques
+php bin/phpunit tests/Functional/EventApiTest.php
+php bin/phpunit tests/Services/NotificationServiceTest.php
+
+# Tests avec verbosité
+php bin/phpunit --testdox
+```
+
 ### Tests Unitaires
 ```bash
 php bin/phpunit tests/Functional/EventApiTest.php
@@ -122,12 +155,32 @@ Créer → Modifier → Publier → Dupliquer → Supprimer
 - Validation des données d'entrée
 - Cas limites (événements pleins, dates passées)
 
-## 🔧 Configuration des Tests
+## ⚙️ Configuration des Tests
 
 ### Base de Données de Test
 - Utilisation de l'environnement `test`
 - Isolation des données par test
 - Nettoyage automatique après chaque test
+
+### Conventions de Conception (Controllers minces, Services riches)
+- Les controllers exposent des endpoints et délèguent la logique métier aux services.
+- Le controller ne fait pas de transformation complexe; le formatage des données est géré côté service.
+- Exemple: `EventController::globalStatistics()` retourne directement le résultat du service `EventService::getGlobalStatistics()`.
+
+### Format de Réponse: `GET /api/events/statistics`
+Le service renvoie des clés en double format pour compatibilité et lisibilité:
+
+- snake_case (compat interne):
+  - `total_events`, `published_events`, `upcoming_events`, `events_this_month`,
+  - `total_registrations`, `confirmed_registrations`, `average_participants_per_event`,
+  - `total_revenue` (placeholder), `popular_categories` (placeholder)
+
+- camelCase (consommateurs externes/tests):
+  - `totalEvents`, `publishedEvents`, `upcomingEvents`, `eventsThisMonth`,
+  - `totalRegistrations`, `confirmedRegistrations`, `averageParticipants`,
+  - `totalRevenue`, `popularCategories`
+
+Raison: garder un controller fin, satisfaire les besoins des tests/consommateurs, et conserver la compatibilité interne.
 
 ### Authentification
 - Utilisation de `loginUser()` pour simuler l'authentification

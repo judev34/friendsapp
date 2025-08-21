@@ -69,7 +69,7 @@ docker-compose exec php php bin/console messenger:stats
 Le fichier `.env.test` doit pointer vers la base de test Docker :
 
 ```env
-DATABASE_URL=mysql://app:password@database_test:3306/friendsapp_test
+DATABASE_URL=mysql://app:password@database-test:3307/friendsapp_test
 MESSENGER_TRANSPORT_DSN=amqp://admin:password123@rabbitmq:5672/%2f/messages
 ```
 
@@ -83,7 +83,7 @@ Adaptation du `phpunit.dist.xml` pour Docker :
         <env name="KERNEL_CLASS" value="App\Kernel" />
         <env name="APP_ENV" value="test" />
         <env name="APP_DEBUG" value="1" />
-        <env name="DATABASE_URL" value="mysql://app:password@database_test:3306/friendsapp_test" />
+        <env name="DATABASE_URL" value="mysql://app:password@database-test:3306/friendsapp_test" />
     </php>
 </phpunit>
 ```
