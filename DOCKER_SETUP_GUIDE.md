@@ -14,7 +14,7 @@ Ce guide vous permet de cloner et démarrer l'application FriendsApp sur n'impor
 3. Vérifier l'installation :
    ```cmd
    docker --version
-   docker-compose --version
+   docker compose version
    ```
 
 #### Mac
@@ -24,7 +24,7 @@ Ce guide vous permet de cloner et démarrer l'application FriendsApp sur n'impor
 4. Vérifier l'installation :
    ```bash
    docker --version
-   docker-compose --version
+   docker compose version
    ```
 
 #### Linux (Ubuntu/Debian)
@@ -34,16 +34,15 @@ curl -fsSL https://get.docker.com -o get-docker.sh
 sudo sh get-docker.sh
 sudo usermod -aG docker $USER
 
-# Installation Docker Compose
-sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-sudo chmod +x /usr/local/bin/docker-compose
+# (Optionnel) Vérifier le plugin Docker Compose v2
+docker compose version
 
 # Redémarrer la session
 newgrp docker
 
 # Vérification
 docker --version
-docker-compose --version
+docker compose version
 ```
 
 ### Configuration Système
@@ -115,24 +114,24 @@ cp .env.docker .env
 
 ```bash
 # Construction des images
-docker-compose build
+docker compose build
 
 # Démarrage des services
-docker-compose up -d
+docker compose up -d
 
 # Vérification du statut
-docker-compose ps
+docker compose ps
 ```
 
 ### 3. Initialisation de la Base de Données
 
 ```bash
 # Installation des dépendances
-docker-compose exec php composer install
+docker compose exec php composer install
 
 # Création et migration de la base
-docker-compose exec php php bin/console doctrine:database:create
-docker-compose exec php php bin/console doctrine:migrations:migrate --no-interaction
+docker compose exec php php bin/console doctrine:database:create
+docker compose exec php php bin/console doctrine:migrations:migrate --no-interaction
 ```
 
 ## 🏗️ Architecture des Services
@@ -142,9 +141,10 @@ docker-compose exec php php bin/console doctrine:migrations:migrate --no-interac
 | Service | Port | Description |
 |---------|------|-------------|
 | **nginx** | 80, 443 | Serveur web |
-| **php** | 9000 | Application Symfony |
+| **php** | 9000 | Application Symfony (dev) |
+| **php-test** | (interne) | Application Symfony (tests) |
 | **database** | 3306 | MySQL principal |
-| **database_test** | 3307 | MySQL pour tests |
+| **database-test** | 3307 (exposé), 3306 (interne) | MySQL pour tests |
 | **rabbitmq** | 5672, 15672 | Message broker |
 
 ### Volumes Docker
@@ -156,52 +156,72 @@ docker-compose exec php php bin/console doctrine:migrations:migrate --no-interac
 
 ## 📱 Commandes Utiles
 
+### AMQP (ext-amqp)
+
+- Les images PHP (dev et test) compilent l'extension `amqp` via PECL et installent `rabbitmq-c`.
+- Vérification dans un conteneur PHP:
+  ```bash
+  docker compose exec php php --ri amqp
+  ```
+- DSN RabbitMQ par défaut (dev): `amqp://admin:password123@rabbitmq:5672/%2f/messages`.
+
 ### Gestion des Services
 
 ```bash
 # Démarrer tous les services
-docker-compose up -d
+docker compose up -d
 
 # Arrêter tous les services
-docker-compose down
+docker compose down
 
 # Redémarrer un service spécifique
-docker-compose restart php
+docker compose restart php
 
 # Voir les logs
-docker-compose logs -f php
-docker-compose logs rabbitmq
+docker compose logs -f php
+docker compose logs rabbitmq
 ```
 
 ### Développement
 
 ```bash
 # Accès au container PHP
-docker-compose exec php bash
+docker compose exec php bash
 
 # Console Symfony
-docker-compose exec php php bin/console
+docker compose exec php php bin/console
 
 # Installation de dépendances
-docker-compose exec php composer install
-docker-compose exec php composer require package/name
+docker compose exec php composer install
+docker compose exec php composer require package/name
 
 # Cache Symfony
-docker-compose exec php php bin/console cache:clear
+docker compose exec php php bin/console cache:clear
 ```
 
 ### Tests
 
 ```bash
 # Démarrage avec profil test
-docker-compose --profile test up -d
+docker compose --profile test up -d
 
-# Exécution des tests
-docker-compose exec php php bin/phpunit
+# Appliquer les migrations en environnement test (DSN interne conteneur)
+docker compose --profile test exec -T php-test sh -lc \
+'APP_ENV=test DATABASE_URL="mysql://app:password@database-test:3306/friendsapp_test" \
+ php bin/console doctrine:migrations:migrate -n --env=test'
+
+# Exécution de la suite de tests
+docker compose --profile test exec -T php-test sh -lc \
+'APP_ENV=test DATABASE_URL="mysql://app:password@database-test:3306/friendsapp_test" \
+ php -d variables_order=EGPCS vendor/bin/phpunit -c phpunit.dist.xml'
 
 # Tests spécifiques
-docker-compose exec php php bin/phpunit tests/Functional/
+docker compose --profile test exec -T php-test sh -lc \
+'APP_ENV=test DATABASE_URL="mysql://app:password@database-test:3306/friendsapp_test" \
+ php -d variables_order=EGPCS vendor/bin/phpunit tests/Functional/'
 ```
+
+> Note: Dans les conteneurs, utilisez `database-test:3306` (port interne). Depuis l'hôte, utilisez `127.0.0.1:3307` si vous lancez les tests hors Docker.
 
 ## 🔍 Dépannage
 
@@ -237,27 +257,27 @@ free -h
 #### 4. Services non accessibles
 ```bash
 # Vérifier le statut
-docker-compose ps
+docker compose ps
 
 # Reconstruire les images
-docker-compose build --no-cache
+docker compose build --no-cache
 
 # Redémarrer complètement
-docker-compose down
-docker-compose up -d
+docker compose down
+docker compose up -d
 ```
 
 ### Logs de Diagnostic
 
 ```bash
 # Logs détaillés
-docker-compose logs --details
+docker compose logs --details
 
 # Logs d'un service spécifique
-docker-compose logs php
+docker compose logs php
 
 # Suivi en temps réel
-docker-compose logs -f --tail=100
+docker compose logs -f --tail=100
 ```
 
 ## 🌐 Accès aux Services
@@ -294,13 +314,13 @@ Password: password
 
 ```bash
 # Démarrer l'environnement
-./docker-start.sh  # ou docker-start.bat
+docker compose up -d
 
 # Vérifier les services
-docker-compose ps
+docker compose ps
 
 # Voir les logs si nécessaire
-docker-compose logs -f php
+docker compose logs -f php
 ```
 
 ### 2. Développement
@@ -308,29 +328,29 @@ docker-compose logs -f php
 ```bash
 # Modifications de code : rechargement automatique
 # Ajout de dépendances
-docker-compose exec php composer require vendor/package
+docker compose exec php composer require vendor/package
 
 # Nouvelles migrations
-docker-compose exec php php bin/console make:migration
-docker-compose exec php php bin/console doctrine:migrations:migrate
+docker compose exec php php bin/console make:migration
+docker compose exec php php bin/console doctrine:migrations:migrate
 ```
 
 ### 3. Tests
 
 ```bash
 # Tests avant commit
-docker-compose --profile test up -d
-docker-compose exec php php bin/phpunit
+docker compose --profile test up -d
+docker compose exec php php bin/phpunit
 ```
 
 ### 4. Arrêt
 
 ```bash
 # Arrêt propre
-docker-compose down
+docker compose down
 
 # Arrêt avec suppression des volumes (attention !)
-docker-compose down -v
+docker compose down -v
 ```
 
 ## 📊 Performance et Optimisation
@@ -350,7 +370,7 @@ docker-compose down -v
 docker system prune -a
 
 # Optimisation des images
-docker-compose build --no-cache
+docker compose build --no-cache
 
 # Monitoring des ressources
 docker stats
@@ -365,4 +385,4 @@ Cet environnement Docker garantit :
 - **Reproductibilité** : Configuration cohérente pour toute l'équipe
 - **Simplicité** : Démarrage en une commande
 
-Pour toute question ou problème, consultez les logs avec `docker-compose logs` ou référez-vous à la section dépannage.
+Pour toute question ou problème, consultez les logs avec `docker compose logs` ou référez-vous à la section dépannage.

@@ -10,17 +10,18 @@ Ce guide explique comment exécuter et gérer les tests dans l'environnement Doc
 
 Le `compose.yaml` inclut des services dédiés aux tests :
 
-- **database_test** : Base MySQL séparée pour les tests (port 3307)
+- **database-test** : Base MySQL séparée pour les tests (exposé 3307, interne 3306)
+- **php-test** : Container PHP dédié aux tests
 - **Profil test** : Services spécifiques activés avec `--profile test`
 
 ### Isolation des Environnements
 
 ```bash
 # Environnement de développement
-docker-compose up -d
+docker compose up -d
 
 # Environnement de test (avec base séparée)
-docker-compose --profile test up -d
+docker compose --profile test up -d
 ```
 
 ## 🚀 Exécution des Tests
@@ -29,37 +30,49 @@ docker-compose --profile test up -d
 
 ```bash
 # Démarrage de l'environnement de test
-docker-compose --profile test up -d
+docker compose --profile test up -d
 
 # Exécution de tous les tests
-docker-compose exec php php bin/phpunit
+docker compose --profile test exec -T php-test sh -lc \
+'APP_ENV=test DATABASE_URL="mysql://app:password@database-test:3306/friendsapp_test" \
+ php -d variables_order=EGPCS vendor/bin/phpunit -c phpunit.dist.xml'
 
 # Tests spécifiques
-docker-compose exec php php bin/phpunit tests/Functional/EventApiTest.php
-docker-compose exec php php bin/phpunit --group integration
+docker compose --profile test exec -T php-test sh -lc \
+'APP_ENV=test DATABASE_URL="mysql://app:password@database-test:3306/friendsapp_test" \
+ php -d variables_order=EGPCS vendor/bin/phpunit tests/Functional/EventApiTest.php'
+docker compose --profile test exec -T php-test sh -lc \
+'APP_ENV=test DATABASE_URL="mysql://app:password@database-test:3306/friendsapp_test" \
+ php -d variables_order=EGPCS vendor/bin/phpunit --group integration'
 ```
 
 ### 2. Tests avec Base de Données
 
 ```bash
 # Création de la base de test
-docker-compose exec php php bin/console doctrine:database:create --env=test
+docker compose --profile test exec -T php-test sh -lc \
+'APP_ENV=test DATABASE_URL="mysql://app:password@database-test:3306/friendsapp_test" \
+ php bin/console doctrine:database:create --env=test'
 
 # Exécution des migrations de test
-docker-compose exec php php bin/console doctrine:migrations:migrate --env=test --no-interaction
+docker compose --profile test exec -T php-test sh -lc \
+'APP_ENV=test DATABASE_URL="mysql://app:password@database-test:3306/friendsapp_test" \
+ php bin/console doctrine:migrations:migrate --env=test --no-interaction'
 
 # Chargement des fixtures (si configurées)
-docker-compose exec php php bin/console doctrine:fixtures:load --env=test --no-interaction
+docker compose --profile test exec -T php-test sh -lc \
+'APP_ENV=test DATABASE_URL="mysql://app:password@database-test:3306/friendsapp_test" \
+ php bin/console doctrine:fixtures:load --env=test --no-interaction'
 ```
 
 ### 3. Tests de Performance avec RabbitMQ
 
 ```bash
 # Vérification du consumer RabbitMQ
-docker-compose exec php php bin/console messenger:consume async --time-limit=60
+docker compose --profile test exec php-test php bin/console messenger:consume async --time-limit=60
 
 # Tests de charge des messages
-docker-compose exec php php bin/console messenger:stats
+docker compose --profile test exec php-test php bin/console messenger:stats
 ```
 
 ## 🔧 Configuration des Tests
@@ -69,7 +82,11 @@ docker-compose exec php php bin/console messenger:stats
 Le fichier `.env.test` doit pointer vers la base de test Docker :
 
 ```env
-DATABASE_URL=mysql://app:password@database-test:3307/friendsapp_test
+## À l'intérieur des conteneurs (recommandé)
+DATABASE_URL=mysql://app:password@database-test:3306/friendsapp_test
+
+## Depuis l'hôte (si vous lancez les tests hors Docker)
+# DATABASE_URL=mysql://app:password@127.0.0.1:3307/friendsapp_test
 MESSENGER_TRANSPORT_DSN=amqp://admin:password123@rabbitmq:5672/%2f/messages
 ```
 
@@ -100,32 +117,32 @@ Adaptation du `phpunit.dist.xml` pour Docker :
 
 ```bash
 # Tests en parallèle (si paratest installé)
-docker-compose exec php vendor/bin/paratest
+docker compose --profile test exec php-test vendor/bin/paratest
 
 # Cache des tests
-docker-compose exec php php bin/console cache:clear --env=test
+docker compose --profile test exec php-test php bin/console cache:clear --env=test
 ```
 
 ### 3. Debugging
 
 ```bash
 # Logs des tests
-docker-compose logs php
+docker compose logs php-test
 
 # Debug d'un test spécifique
-docker-compose exec php php bin/phpunit --debug tests/Functional/EventApiTest.php
+docker compose --profile test exec php-test php -d variables_order=EGPCS vendor/bin/phpunit --debug tests/Functional/EventApiTest.php
 
 # Accès au container pour debugging
-docker-compose exec php bash
+docker compose exec php-test bash
 ```
 
 ### 4. Tests d'Intégration
 
 ```bash
 # Test complet de la stack
-docker-compose exec php php bin/console debug:router
-docker-compose exec php php bin/console debug:container
-docker-compose exec php php bin/console messenger:stats
+docker compose --profile test exec php-test php bin/console debug:router
+docker compose --profile test exec php-test php bin/console debug:container
+docker compose --profile test exec php-test php bin/console messenger:stats
 ```
 
 ## 🔄 Workflow de Test Recommandé
@@ -135,17 +152,22 @@ docker-compose exec php php bin/console messenger:stats
 ```bash
 # 1. Démarrage de l'environnement de test
 ./docker-start.sh  # ou docker-start.bat sur Windows
-docker-compose --profile test up -d
+docker compose --profile test up -d
 
 # 2. Préparation de la base de test
-docker-compose exec php php bin/console doctrine:database:create --env=test
-docker-compose exec php php bin/console doctrine:migrations:migrate --env=test --no-interaction
+docker compose --profile test exec -T php-test sh -lc \
+'APP_ENV=test DATABASE_URL="mysql://app:password@database-test:3306/friendsapp_test" \
+ php bin/console doctrine:database:create --env=test && \
+ APP_ENV=test DATABASE_URL="mysql://app:password@database-test:3306/friendsapp_test" \
+ php bin/console doctrine:migrations:migrate --env=test --no-interaction'
 
 # 3. Exécution des tests
-docker-compose exec php php bin/phpunit
+docker compose --profile test exec -T php-test sh -lc \
+'APP_ENV=test DATABASE_URL="mysql://app:password@database-test:3306/friendsapp_test" \
+ php -d variables_order=EGPCS vendor/bin/phpunit -c phpunit.dist.xml'
 
 # 4. Nettoyage
-docker-compose --profile test down
+docker compose --profile test down
 ```
 
 ### 2. Intégration Continue (CI/CD)
@@ -154,15 +176,15 @@ docker-compose --profile test down
 # Exemple GitHub Actions
 steps:
   - name: Start Docker environment
-    run: docker-compose --profile test up -d
+    run: docker compose --profile test up -d
   
   - name: Setup test database
     run: |
-      docker-compose exec -T php php bin/console doctrine:database:create --env=test
-      docker-compose exec -T php php bin/console doctrine:migrations:migrate --env=test --no-interaction
+      docker compose --profile test exec -T php-test sh -lc 'APP_ENV=test DATABASE_URL="mysql://app:password@database-test:3306/friendsapp_test" php bin/console doctrine:database:create --env=test'
+      docker compose --profile test exec -T php-test sh -lc 'APP_ENV=test DATABASE_URL="mysql://app:password@database-test:3306/friendsapp_test" php bin/console doctrine:migrations:migrate --env=test --no-interaction'
   
   - name: Run tests
-    run: docker-compose exec -T php php bin/phpunit --coverage-clover coverage.xml
+    run: docker compose --profile test exec -T php-test sh -lc 'APP_ENV=test DATABASE_URL="mysql://app:password@database-test:3306/friendsapp_test" php -d variables_order=EGPCS vendor/bin/phpunit -c phpunit.dist.xml --coverage-clover coverage.xml'
 ```
 
 ## 🐛 Dépannage
@@ -172,42 +194,42 @@ steps:
 1. **Base de données non accessible**
    ```bash
    # Vérifier le statut des services
-   docker-compose ps
+   docker compose ps
    
    # Vérifier les logs
-   docker-compose logs database_test
+   docker compose logs database-test
    ```
 
 2. **RabbitMQ non disponible**
    ```bash
    # Redémarrer RabbitMQ
-   docker-compose restart rabbitmq
+   docker compose restart rabbitmq
    
    # Vérifier la connexion
-   docker-compose exec php php bin/console messenger:stats
+   docker compose --profile test exec php-test php bin/console messenger:stats
    ```
 
 3. **Permissions de fichiers**
    ```bash
    # Corriger les permissions
-   docker-compose exec php chown -R www-data:www-data var/
+   docker compose exec php-test chown -R www-data:www-data var/
    ```
 
 ### Commandes de Diagnostic
 
 ```bash
 # État des services
-docker-compose ps
+docker compose ps
 
 # Utilisation des ressources
 docker stats
 
 # Logs en temps réel
-docker-compose logs -f php
+docker compose logs -f php-test
 
 # Inspection d'un container
-docker-compose exec php php -m  # Extensions PHP
-docker-compose exec php php -v  # Version PHP
+docker compose exec php-test php -m  # Extensions PHP
+docker compose exec php-test php -v  # Version PHP
 ```
 
 ## 📈 Monitoring des Tests
@@ -222,14 +244,24 @@ docker-compose exec php php -v  # Version PHP
 
 ```bash
 # Profiling des tests
-docker-compose exec php php bin/phpunit --profile
+docker compose --profile test exec php-test php -d variables_order=EGPCS vendor/bin/phpunit --profile
 
 # Analyse de la couverture
-docker-compose exec php php bin/phpunit --coverage-html coverage/
+docker compose --profile test exec php-test php -d variables_order=EGPCS vendor/bin/phpunit --coverage-html coverage/
 
 # Métriques de performance
-docker-compose exec php php bin/console debug:container --env=test
+docker compose --profile test exec php-test php bin/console debug:container --env=test
 ```
+
+## 📨 AMQP (ext-amqp)
+
+- Les images PHP (dev et test) incluent l'extension `amqp` compilée via PECL et la lib `rabbitmq-c`.
+- Vérifier l'installation dans un conteneur:
+  ```bash
+  docker compose exec php-test php --ri amqp
+  ```
+- DSN par défaut:
+  - `MESSENGER_TRANSPORT_DSN=amqp://admin:password123@rabbitmq:5672/%2f/messages`
 
 ## 🎯 Conclusion
 

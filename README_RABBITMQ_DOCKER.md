@@ -4,20 +4,20 @@
 
 ### 1. Lancer RabbitMQ avec Docker
 ```bash
-# Démarrer tous les services (PostgreSQL + RabbitMQ)
-docker-compose up -d
+# Démarrer tous les services (MySQL + RabbitMQ)
+docker compose up -d
 
 # Ou seulement RabbitMQ
-docker-compose up -d rabbitmq
+docker compose up -d rabbitmq
 ```
 
 ### 2. Vérifier que RabbitMQ fonctionne
 ```bash
 # Vérifier les logs
-docker-compose logs rabbitmq
+docker compose logs rabbitmq
 
 # Vérifier le status
-docker-compose ps
+docker compose ps
 ```
 
 ### 3. Accéder à l'interface de management
@@ -30,7 +30,11 @@ docker-compose ps
 ### Variables d'environnement
 ```bash
 # .env.dev
-MESSENGER_TRANSPORT_DSN=amqp://admin:password123@127.0.0.1:5672/%2f/messages
+# Dans les conteneurs Docker (recommandé)
+MESSENGER_TRANSPORT_DSN=amqp://admin:password123@rabbitmq:5672/%2f/messages
+
+# Depuis l'hôte (si vous lancez l'app hors Docker)
+# MESSENGER_TRANSPORT_DSN=amqp://admin:password123@127.0.0.1:5672/%2f/messages
 ```
 
 ### Configuration Messenger
@@ -49,8 +53,8 @@ framework:
 
 ### 1. Démarrer le worker Symfony
 ```bash
-# Dans un terminal séparé
-php bin/console messenger:consume async -vv
+# Dans un terminal séparé (Docker)
+docker compose exec php php bin/console messenger:consume async -vv
 ```
 
 ### 2. Créer un événement via API
@@ -83,13 +87,13 @@ POST /api/events
 ### Commandes Symfony
 ```bash
 # Statistiques des queues
-php bin/console messenger:stats
+docker compose exec php php bin/console messenger:stats
 
 # Consommer avec debug
-php bin/console messenger:consume async -vv
+docker compose exec php php bin/console messenger:consume async -vv
 
 # Setup des transports
-php bin/console messenger:setup-transports
+docker compose exec php php bin/console messenger:setup-transports
 ```
 
 ## 🔄 Coexistence avec EventListeners
@@ -110,21 +114,21 @@ Le système actuel fonctionne avec **DEUX systèmes en parallèle** :
 
 ### Windows
 ```powershell
-docker-compose up -d
+docker compose up -d
 ```
 
 ### Mac/Linux
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 ### Arrêt
 ```bash
 # Arrêter les services
-docker-compose down
+docker compose down
 
 # Arrêter et supprimer les volumes
-docker-compose down -v
+docker compose down -v
 ```
 
 ## 🚨 Troubleshooting
@@ -136,7 +140,7 @@ netstat -an | findstr 5672
 netstat -an | findstr 15672
 
 # Redémarrer le service
-docker-compose restart rabbitmq
+docker compose restart rabbitmq
 ```
 
 ### Messages non traités
@@ -145,8 +149,20 @@ docker-compose restart rabbitmq
 php bin/console debug:messenger
 
 # Vérifier les transports
-php bin/console messenger:stats
+docker compose exec php php bin/console messenger:stats
 ```
+
+## 📨 AMQP (ext-amqp)
+
+- Les images PHP Docker (dev/test) incluent l'extension `amqp` compilée via PECL et la lib `rabbitmq-c`.
+- Vérifier l'installation:
+  ```bash
+  docker compose exec php php --ri amqp
+  ```
+  ou côté tests:
+  ```bash
+  docker compose --profile test exec php-test php --ri amqp
+  ```
 
 ### Connexion refusée
 - Vérifier que Docker est démarré

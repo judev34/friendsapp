@@ -159,12 +159,30 @@ Créer une collection avec :
 
 ### **3. Tests avec PHPUnit**
 ```bash
-# Lancer les tests
+# Lancer les tests (hors Docker)
 php bin/phpunit
 
-# Tests avec couverture
+# Tests avec couverture (hors Docker)
 php bin/phpunit --coverage-html coverage/
 ```
+
+#### Exécution sous Docker (recommandé)
+```bash
+# Démarrer les services de test
+docker compose --profile test up -d
+
+# Lancer la suite de tests dans le conteneur php-test (DSN interne)
+docker compose --profile test exec -T php-test sh -lc \
+'APP_ENV=test DATABASE_URL="mysql://app:password@database-test:3306/friendsapp_test" \
+ php -d variables_order=EGPCS vendor/bin/phpunit -c phpunit.dist.xml'
+
+# Générer la couverture dans var/coverage (dans le conteneur)
+docker compose --profile test exec -T php-test sh -lc \
+'APP_ENV=test DATABASE_URL="mysql://app:password@database-test:3306/friendsapp_test" \
+ php -d variables_order=EGPCS vendor/bin/phpunit -c phpunit.dist.xml --coverage-html var/coverage'
+```
+
+> Pour plus de détails: voir `DOCKER_TESTING_GUIDE.md`.
 
 ## 📊 Monitoring et Debug
 

@@ -13,7 +13,8 @@ RUN apk add --no-cache \
     oniguruma-dev \
     mysql-client \
     supervisor \
-    nginx
+    nginx \
+    rabbitmq-c
 
 # Installation des extensions PHP
 RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
@@ -26,6 +27,12 @@ RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
         mbstring \
         opcache \
         bcmath
+
+# Installation de l'extension AMQP (via PECL) pour Symfony Messenger (Alpine)
+RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS rabbitmq-c-dev openssl-dev \
+    && pecl install amqp \
+    && docker-php-ext-enable amqp \
+    && apk del .build-deps
 
 # Installation de Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer

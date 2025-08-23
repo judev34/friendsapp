@@ -171,7 +171,7 @@ La documentation Swagger est disponible à `/api/doc` (nécessite l'installation
 
 ### Mesures Implémentées
 - **Validation stricte** : Contraintes Symfony Validator sur toutes les entités
-- **Authentification robuste** : JWT + sessions hybrides
+- **TODO Authentification robuste** : JWT + sessions hybrides 
 - **Autorisation fine** : Contrôle d'accès basé sur les rôles
 - **Protection CSRF** : Tokens automatiques
 - **Rate limiting** : Protection contre les abus
@@ -263,3 +263,36 @@ JWT_SECRET_KEY=%kernel.project_dir%/config/jwt/private.pem
 **Développé avec ❤️ en Symfony 7.3**
 
 *Ce projet illustre les meilleures pratiques du développement web moderne et constitue une base solide pour des applications d'entreprise.*
+
+## 🐳 Docker + AMQP
+
+- __PHP (Alpine)__: `ext-amqp` installé via PECL, `rabbitmq-c` présent (voir `Dockerfile` et `Dockerfile.dev`).
+- __RabbitMQ__: service `rabbitmq` (ports 5672/15672). DSN par défaut: `amqp://admin:password123@rabbitmq:5672/%2f/messages`.
+- __Démarrage rapide__:
+  ```bash
+  ./docker-start.sh
+  # ou manuellement
+  docker compose up -d
+  ```
+
+## 🧪 Tests via Docker (profil test)
+
+- __Démarrer les services de test__:
+  ```bash
+  docker compose --profile test up -d
+  ```
+
+- __Base de données de test__:
+  - Dans les conteneurs: `DATABASE_URL=mysql://app:password@database-test:3306/friendsapp_test`
+  - Depuis l'hôte: `127.0.0.1:3307` (port publié)
+
+- __Migrations + Tests__:
+  ```bash
+  docker compose --profile test exec -T php-test sh -lc \
+  'APP_ENV=test DATABASE_URL="mysql://app:password@database-test:3306/friendsapp_test" \
+   php bin/console doctrine:migrations:migrate -n --env=test && \
+   APP_ENV=test DATABASE_URL="mysql://app:password@database-test:3306/friendsapp_test" \
+   php -d variables_order=EGPCS vendor/bin/phpunit -c phpunit.dist.xml'
+  ```
+
+- __Astuce__: `/.env.test.example` documente les deux DSN (interne conteneur vs hôte). Adaptez votre `.env.test` si vous lancez les tests hors Docker.
