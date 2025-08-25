@@ -223,6 +223,31 @@ docker compose --profile test exec -T php-test sh -lc \
 
 > Note: Dans les conteneurs, utilisez `database-test:3306` (port interne). Depuis l'hôte, utilisez `127.0.0.1:3307` si vous lancez les tests hors Docker.
 
+### Variables d'environnement pour les tests
+
+Symfony charge automatiquement `.env.test` lorsque `APP_ENV=test`. Assurez-vous d'avoir un fichier `.env.test` (copié depuis `.env.test.example`) contenant au minimum :
+
+```dotenv
+# .env.test
+MAILER_FROM_EMAIL="test@friendsapp.local"
+SLACK_WEBHOOK_URL="http://nginx/"
+```
+
+- `MAILER_FROM_EMAIL` est requis par `App\Strategy\EmailNotificationStrategy` via `config/services.yaml`.
+- `SLACK_WEBHOOK_URL` est requis par `App\Strategy\SlackNotificationStrategy` via `config/services.yaml`.
+
+Pour (re)prendre en compte ces variables dans le conteneur de tests :
+
+```bash
+docker compose --profile test exec -T php-test sh -lc 'php bin/console cache:clear --env=test'
+```
+
+Ensuite, relancez la suite de tests :
+
+```bash
+docker compose --profile test exec -T php-test sh -lc 'vendor/bin/phpunit -c phpunit.dist.xml'
+```
+
 ## 🔍 Dépannage
 
 ### Problèmes Courants
