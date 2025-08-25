@@ -101,8 +101,8 @@ Le développement complet de l'**EventService** et de l'**API Events** est maint
 
 #### **Guides Créés**
 - `WORKFLOW_EVENTS.md` - Fonctionnement des EventListeners
-- `BRUNO_STEP_BY_STEP.md` - Tests API avec Bruno
-- `TESTING_COMPLETE_GUIDE.md` - Guide complet des tests
+- BRUNO — [api/BRUNO.md](api/BRUNO.md) (guide actuel)
+- Tests — [testing/TESTING.md](testing/TESTING.md) et [testing/TESTING_ADVANCED.md](testing/TESTING_ADVANCED.md)
 - `PROJECT_COMPLETION_SUMMARY.md` - Résumé final
 
 #### **OpenAPI/Swagger**

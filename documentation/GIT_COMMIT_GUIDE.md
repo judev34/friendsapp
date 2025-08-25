@@ -22,18 +22,19 @@
 ### **📚 Documentation**
 ```
 ✅ README.md
-✅ INSTALLATION_GUIDE.md
-✅ BRUNO_IMPORT_GUIDE.md
-✅ BRUNO_STEP_BY_STEP.md
-✅ BRUNO_WINDOWS_ACCESS.md
-✅ DOCKER_SETUP_GUIDE.md
-✅ DOCKER_TESTING_GUIDE.md
-✅ TESTING_COMPLETE_GUIDE.md
-✅ TESTING_GUIDE.md
-✅ TESTING_PROFESSIONAL_GUIDE.md
-✅ PROJECT_COMPLETION_SUMMARY.md
-✅ README_RABBITMQ_DOCKER.md
-✅ WORKFLOW_EVENTS.md
+✅ documentation/INDEX.md
+✅ documentation/setup/SETUP_LOCAL.md
+✅ documentation/setup/SETUP_DOCKER.md
+✅ documentation/api/API_GUIDE.md
+✅ documentation/api/OPENAPI.md
+✅ documentation/api/BRUNO.md
+✅ documentation/testing/TESTING.md
+✅ documentation/testing/TESTING_ADVANCED.md
+✅ documentation/operations/MESSENGER_RABBITMQ.md
+✅ documentation/COMMANDS.md
+✅ documentation/WORKFLOW_EVENTS.md
+✅ documentation/GIT_COMMIT_GUIDE.md
+✅ documentation/PROJECT_COMPLETION_SUMMARY.md
 ```
 
 ### **⚙️ Configuration Symfony**
@@ -189,7 +190,7 @@ Votre projet est maintenant **propre et fonctionnel** pour un nouveau développe
 
 1. **Clone** → `git clone <repo>`
 2. **Installation** → `./dev-setup.sh`
-3. **Documentation** → `INSTALLATION_GUIDE.md`
+3. **Documentation** → `documentation/INDEX.md`
 4. **Tests API** → Bruno avec guides inclus
 
 **Aucun fichier inutile, configuration complète, documentation à jour !** ✨
