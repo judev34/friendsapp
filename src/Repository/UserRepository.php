@@ -85,13 +85,15 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
      */
     public function getUserRegistrationStats(): array
     {
-        return $this->createQueryBuilder('u')
-            ->select('YEAR(u.createdAt) as year, MONTH(u.createdAt) as month, COUNT(u.id) as count')
-            ->groupBy('year, month')
+        // Utilise les fonctions DQL YEAR et MONTH fournies par beberlei/doctrineextensions
+        $qb = $this->createQueryBuilder('u')
+            ->select('YEAR(u.createdAt) AS year', 'MONTH(u.createdAt) AS month', 'COUNT(u.id) AS count')
+            ->groupBy('year')
+            ->addGroupBy('month')
             ->orderBy('year', 'DESC')
-            ->addOrderBy('month', 'DESC')
-            ->getQuery()
-            ->getResult();
+            ->addOrderBy('month', 'DESC');
+
+        return $qb->getQuery()->getArrayResult();
     }
 
     /**

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Annulation d'inscription - Notification Organisateur</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background-color: #dc3545;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 5px 5px 0 0;
+        }
+        .content {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 0 0 5px 5px;
+        }
+        .event-details {
+            background-color: white;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .footer {
+            text-align: center;
+            color: #666;
+            font-size: 12px;
+            margin-top: 20px;
+        }
+        .highlight {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>❌ Annulation d'inscription</h1>
+    </div>
+
+    <div class="content">
+        <p>Bonjour {{ organizer.firstName }},</p>
+
+        <p>Un participant a <span class="highlight">annulé</span> son inscription à votre événement :</p>
+
+        <div class="event-details">
+            <h3>{{ event.title }}</h3>
+            <p><strong>📅 Date :</strong> {{ event.startDate|date('d/m/Y à H:i') }}</p>
+            <p><strong>📍 Lieu :</strong> {{ event.location }}</p>
+        </div>
+
+        <p><strong>Participant :</strong> {{ registration.user.fullName }}</p>
+        <p><strong>Statut de l'inscription :</strong> Annulée</p>
+
+        <p>Ce message est une notification automatique pour vous tenir informé des changements sur votre événement.</p>
+
+        <p>L'équipe EventApp</p>
+    </div>
+
+    <div class="footer">
+        <p>Cet email a été envoyé automatiquement, merci de ne pas y répondre.</p>
+    </div>
+</body>
+</html>

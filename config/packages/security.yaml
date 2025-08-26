@@ -46,6 +46,8 @@ security:
         - { path: ^/api/register, roles: PUBLIC_ACCESS }
         - { path: ^/api/doc, roles: PUBLIC_ACCESS }
         - { path: ^/api/docs, roles: PUBLIC_ACCESS }
+        # Endpoint public pour retrouver une inscription via le ticketCode
+        - { path: ^/api/registrations/ticket, roles: PUBLIC_ACCESS, methods: [GET] }
         # Routes publiques pour consultation des événements
         - { path: ^/api/events$, roles: PUBLIC_ACCESS, methods: [GET] }
         - { path: ^/api/events/\d+$, roles: PUBLIC_ACCESS, methods: [GET] }

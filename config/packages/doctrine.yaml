@@ -28,6 +28,10 @@ doctrine:
                 alias: App
         controller_resolver:
             auto_mapping: false
+        dql:
+            datetime_functions:
+                YEAR: DoctrineExtensions\Query\Mysql\Year
+                MONTH: DoctrineExtensions\Query\Mysql\Month
 
 when@test:
     doctrine:

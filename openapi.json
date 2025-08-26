@@ -1,20 +1,10 @@
 {
     "openapi": "3.0.0",
     "info": {
-        "title": "EventApp API",
-        "description": "API REST pour la gestion d'événements collaboratifs - Plateforme de création, gestion et inscription à des événements",
-        "version": "1.0.0",
-        "contact": {
-            "name": "EventApp Support",
-            "email": "support@eventapp.com"
-        }
+        "title": "My App",
+        "description": "This is an awesome app!",
+        "version": "1.0.0"
     },
-    "servers": [
-        {
-            "url": "http://localhost:8000",
-            "description": "Serveur de développement"
-        }
-    ],
     "paths": {
         "/api/register": {
             "post": {
@@ -373,7 +363,7 @@
                                     "price": {
                                         "type": "number",
                                         "format": "float",
-                                        "example": 25.99
+                                        "example": 25.989999999999998436805981327779591083526611328125
                                     },
                                     "tags": {
                                         "type": "array",
@@ -533,7 +523,7 @@
                                     "price": {
                                         "type": "number",
                                         "format": "float",
-                                        "example": 25.99
+                                        "example": 25.989999999999998436805981327779591083526611328125
                                     },
                                     "tags": {
                                         "type": "array",
@@ -702,7 +692,7 @@
                 "tags": [
                     "Events"
                 ],
-                "summary": "Événements à venir",
+                "summary": "\u00c9v\u00e9nements \u00e0 venir",
                 "operationId": "get_api_events_upcoming",
                 "parameters": [
                     {
@@ -715,7 +705,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Événements à venir"
+                        "description": "\u00c9v\u00e9nements \u00e0 venir"
                     }
                 }
             }
@@ -725,7 +715,7 @@
                 "tags": [
                     "Events"
                 ],
-                "summary": "Événements par catégorie",
+                "summary": "\u00c9v\u00e9nements par cat\u00e9gorie",
                 "operationId": "get_api_events_by_category",
                 "parameters": [
                     {
@@ -734,73 +724,8 @@
                         "required": true,
                         "schema": {
                             "type": "string"
-                        },
-                        "description": "Nom de la catégorie/tag",
-                        "example": "tech"
+                        }
                     },
-                    {
-                        "name": "limit",
-                        "in": "query",
-                        "schema": {
-                            "type": "integer",
-                            "default": 20
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Liste des événements de la catégorie",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "properties": {
-                                            "id": {
-                                                "type": "integer"
-                                            },
-                                            "title": {
-                                                "type": "string"
-                                            },
-                                            "description": {
-                                                "type": "string"
-                                            },
-                                            "startDate": {
-                                                "type": "string",
-                                                "format": "date-time"
-                                            },
-                                            "location": {
-                                                "type": "string"
-                                            },
-                                            "tags": {
-                                                "type": "array",
-                                                "items": {
-                                                    "type": "string"
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/events/recommended": {
-            "get": {
-                "tags": [
-                    "Events"
-                ],
-                "summary": "Événements recommandés",
-                "operationId": "get_api_events_recommended",
-                "security": [
-                    {
-                        "session": []
-                    }
-                ],
-                "parameters": [
                     {
                         "name": "limit",
                         "in": "query",
@@ -812,42 +737,34 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Événements recommandés pour l'utilisateur",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "type": "object",
-                                        "properties": {
-                                            "id": {
-                                                "type": "integer"
-                                            },
-                                            "title": {
-                                                "type": "string"
-                                            },
-                                            "description": {
-                                                "type": "string"
-                                            },
-                                            "startDate": {
-                                                "type": "string",
-                                                "format": "date-time"
-                                            },
-                                            "location": {
-                                                "type": "string"
-                                            },
-                                            "recommendationScore": {
-                                                "type": "number",
-                                                "description": "Score de recommandation basé sur l'historique"
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                        "description": "\u00c9v\u00e9nements de la cat\u00e9gorie"
+                    }
+                }
+            }
+        },
+        "/api/events/recommended": {
+            "get": {
+                "tags": [
+                    "Events"
+                ],
+                "summary": "\u00c9v\u00e9nements recommand\u00e9s pour l'utilisateur connect\u00e9",
+                "operationId": "get_api_events_recommended",
+                "parameters": [
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "default": 5
                         }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "\u00c9v\u00e9nements recommand\u00e9s"
                     },
                     "401": {
-                        "description": "Authentification requise"
+                        "description": "Non authentifi\u00e9"
                     }
                 }
             }
@@ -857,65 +774,44 @@
                 "tags": [
                     "Events"
                 ],
-                "summary": "Statistiques globales des événements",
+                "summary": "Statistiques globales des \u00e9v\u00e9nements (Admin)",
                 "operationId": "get_api_events_global_statistics",
-                "security": [
-                    {
-                        "session": []
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "Statistiques globales",
                         "content": {
                             "application/json": {
                                 "schema": {
-                                    "type": "object",
                                     "properties": {
-                                        "totalEvents": {
-                                            "type": "integer",
-                                            "description": "Nombre total d'événements"
+                                        "total_events": {
+                                            "type": "integer"
                                         },
-                                        "totalRegistrations": {
-                                            "type": "integer",
-                                            "description": "Nombre total d'inscriptions"
+                                        "published_events": {
+                                            "type": "integer"
                                         },
-                                        "totalRevenue": {
-                                            "type": "number",
-                                            "description": "Revenus totaux générés"
+                                        "upcoming_events": {
+                                            "type": "integer"
                                         },
-                                        "eventsThisMonth": {
-                                            "type": "integer",
-                                            "description": "Événements créés ce mois"
+                                        "events_this_month": {
+                                            "type": "integer"
                                         },
-                                        "averageParticipants": {
-                                            "type": "number",
-                                            "description": "Moyenne de participants par événement"
+                                        "total_registrations": {
+                                            "type": "integer"
                                         },
-                                        "popularCategories": {
-                                            "type": "array",
-                                            "items": {
-                                                "type": "object",
-                                                "properties": {
-                                                    "category": {
-                                                        "type": "string"
-                                                    },
-                                                    "count": {
-                                                        "type": "integer"
-                                                    }
-                                                }
-                                            }
+                                        "confirmed_registrations": {
+                                            "type": "integer"
+                                        },
+                                        "average_participants_per_event": {
+                                            "type": "number"
                                         }
-                                    }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
                     },
-                    "401": {
-                        "description": "Authentification requise"
-                    },
                     "403": {
-                        "description": "Accès réservé aux administrateurs"
+                        "description": "Acc\u00e8s refus\u00e9 - Admin requis"
                     }
                 }
             }
@@ -925,13 +821,8 @@
                 "tags": [
                     "Events"
                 ],
-                "summary": "Dupliquer un événement",
+                "summary": "Dupliquer un \u00e9v\u00e9nement",
                 "operationId": "post_api_events_duplicate",
-                "security": [
-                    {
-                        "session": []
-                    }
-                ],
                 "parameters": [
                     {
                         "name": "id",
@@ -945,56 +836,13 @@
                 ],
                 "responses": {
                     "201": {
-                        "description": "Événement dupliqué avec succès",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "object",
-                                    "properties": {
-                                        "id": {
-                                            "type": "integer"
-                                        },
-                                        "title": {
-                                            "type": "string",
-                                            "description": "Titre avec préfixe 'Copie de'"
-                                        },
-                                        "description": {
-                                            "type": "string"
-                                        },
-                                        "startDate": {
-                                            "type": "string",
-                                            "format": "date-time",
-                                            "description": "Date décalée d'une semaine"
-                                        },
-                                        "isPublished": {
-                                            "type": "boolean",
-                                            "example": false,
-                                            "description": "Toujours false pour les copies"
-                                        },
-                                        "organizer": {
-                                            "type": "object",
-                                            "properties": {
-                                                "id": {
-                                                    "type": "integer"
-                                                },
-                                                "email": {
-                                                    "type": "string"
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Authentification requise"
+                        "description": "\u00c9v\u00e9nement dupliqu\u00e9"
                     },
                     "403": {
-                        "description": "Seul le propriétaire peut dupliquer"
+                        "description": "Acc\u00e8s refus\u00e9"
                     },
                     "404": {
-                        "description": "Événement non trouvé"
+                        "description": "\u00c9v\u00e9nement non trouv\u00e9"
                     }
                 }
             }
@@ -1286,32 +1134,19 @@
             }
         }
     },
-    "components": {
-        "securitySchemes": {
-            "session": {
-                "type": "apiKey",
-                "in": "cookie",
-                "name": "PHPSESSID",
-                "description": "Authentification par session Symfony"
-            }
-        }
-    },
     "tags": [
         {
             "name": "Authentication",
             "description": "Gestion de l'authentification des utilisateurs"
         },
         {
-            "name": "Events",
-            "description": "Gestion des événements - CRUD complet, recherche avancée, statistiques"
+            "name": "Events"
         },
         {
-            "name": "Registrations",
-            "description": "Gestion des inscriptions aux événements"
+            "name": "Registrations"
         },
         {
-            "name": "Users",
-            "description": "Gestion des utilisateurs et profils"
+            "name": "Users"
         }
     ]
 }
